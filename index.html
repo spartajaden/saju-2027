@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A0E1A">
+<title>2027 정미년 신년운세 · 재물·취업 사주 리포트</title>
+<meta name="description" content="사주팔자와 2027 정미년 세운으로 읽는 재물운·취업운·월별 로드맵">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div class="bg-aurora" aria-hidden="true"></div>
+<div class="bg-seal" aria-hidden="true">丁未</div>
+
+<header class="topbar">
+  <a class="brand" href="#" data-go="home">
+    <span class="brand-mark">未</span>
+    <span class="brand-text">정미년 리포트<em>2027 SAJU</em></span>
+  </a>
+  <span class="topbar-note">만세력 기반</span>
+</header>
+
+<main>
+  <!-- ============ 1. 입력 화면 ============ -->
+  <section class="view is-active" id="view-home">
+    <div class="hero">
+      <p class="eyebrow"><span class="dot"></span>재물 · 취업 특화 신년 사주</p>
+      <h1 class="hero-title">
+        <span class="hero-year">2027</span>
+        <span class="hero-han">丁未</span>
+        <span class="hero-sub">정미년, 내 돈과 일의 흐름</span>
+      </h1>
+      <p class="lede">태어난 날의 사주팔자에 2027년 정미(丁未)년의 기운을 겹쳐<br>
+        재물운·취업운·월별 타이밍까지 한 번에 읽어 드립니다.</p>
+      <div class="hero-strip" aria-hidden="true">
+        <span class="strip-elem" style="--c:#6FBF8B">木</span>
+        <span class="strip-elem" style="--c:#E0705F">火</span>
+        <span class="strip-elem" style="--c:#D6B25A">土</span>
+        <span class="strip-elem" style="--c:#BFD0DA">金</span>
+        <span class="strip-elem" style="--c:#6E9BE0">水</span>
+      </div>
+    </div>
+
+    <form class="card form-card" id="saju-form" novalidate>
+      <h2 class="card-title">내 사주 정보</h2>
+
+      <div class="field">
+        <label for="name">이름 <span class="opt">선택</span></label>
+        <input id="name" name="name" type="text" placeholder="리포트에 표시할 이름" autocomplete="off" maxlength="20">
+      </div>
+
+      <div class="field">
+        <span class="label">성별</span>
+        <div class="seg" role="radiogroup" aria-label="성별">
+          <button type="button" class="seg-btn is-on" data-gender="male" role="radio" aria-checked="true">남</button>
+          <button type="button" class="seg-btn" data-gender="female" role="radio" aria-checked="false">여</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="label">생년월일</span>
+        <div class="seg seg-slim" role="radiogroup" aria-label="달력 구분">
+          <button type="button" class="seg-btn is-on" data-cal="solar" role="radio" aria-checked="true">양력</button>
+          <button type="button" class="seg-btn" data-cal="lunar" role="radio" aria-checked="false">음력</button>
+        </div>
+        <div class="date-row">
+          <select id="year" aria-label="출생 연도"></select>
+          <select id="month" aria-label="출생 월"></select>
+          <select id="day" aria-label="출생 일"></select>
+        </div>
+        <label class="check is-hidden" id="leap-wrap">
+          <input type="checkbox" id="leap"> <span id="leap-label">윤달</span>
+        </label>
+      </div>
+
+      <div class="field">
+        <label for="si">태어난 시간</label>
+        <select id="si" aria-label="태어난 시간"></select>
+        <p class="hint" id="si-hint">모르면 <b>모름</b>을 선택하세요. 세 기둥으로 계산합니다.</p>
+      </div>
+
+      <p class="form-error" id="form-error" hidden></p>
+
+      <button type="submit" class="cta">
+        <span>2027년 운세 보기</span>
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <p class="form-foot">입력한 정보는 브라우저 안에서만 계산됩니다 · 무료 미리보기 제공</p>
+    </form>
+
+    <ul class="features">
+      <li><b>만세력 기준</b> 입춘·절기로 사주팔자를 세웁니다</li>
+      <li><b>재물·취업 특화</b> 현금흐름과 합격운을 짚어 드립니다</li>
+      <li><b>월별 로드맵</b> 2027년 12개월을 미리 배치합니다</li>
+    </ul>
+  </section>
+
+  <!-- ============ 2. 계산 중 ============ -->
+  <section class="view" id="view-loading">
+    <div class="loading">
+      <div class="loading-orb"><span>丁</span><span>未</span></div>
+      <h2>사주를 세우는 중</h2>
+      <ol class="loading-steps">
+        <li data-step="0">만세력 절기 대조</li>
+        <li data-step="1">사주 원국 배열</li>
+        <li data-step="2">대운 · 세운 계산</li>
+        <li data-step="3">정미년 운세 정리</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ 3. 결과 ============ -->
+  <section class="view" id="view-result">
+    <div class="result-head">
+      <p class="eyebrow"><span class="dot"></span>2027 정미년 신년 사주 리포트</p>
+      <h1 class="result-name" id="r-name">-</h1>
+      <p class="result-meta" id="r-meta">-</p>
+      <p class="result-tags" id="r-tags"></p>
+    </div>
+
+    <!-- 히어로 요약 카드 -->
+    <section class="card hero-card" id="hero-card">
+      <div class="hero-card-top">
+        <div>
+          <p class="hero-card-label">2027년 한 줄 총평</p>
+          <p class="hero-card-line" id="r-heroline">-</p>
+        </div>
+        <span class="hero-card-year" aria-hidden="true">2027<br>丁未</span>
+      </div>
+      <div class="hero-gauges">
+        <div class="gauge">
+          <div class="gauge-head"><span>재물 <em>財</em></span><b id="g-wealth">-</b></div>
+          <div class="gauge-track"><span class="gauge-fill g-money" id="gf-wealth" style="width:0%"></span></div>
+        </div>
+        <div class="gauge">
+          <div class="gauge-head"><span>직업 <em>職</em></span><b id="g-career">-</b></div>
+          <div class="gauge-track"><span class="gauge-fill g-work" id="gf-career" style="width:0%"></span></div>
+        </div>
+        <div class="gauge">
+          <div class="gauge-head"><span>안정 <em>安</em></span><b id="g-stability">-</b></div>
+          <div class="gauge-track"><span class="gauge-fill g-stab" id="gf-stability" style="width:0%"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="result-grid">
+      <!-- 왼쪽 열 -->
+      <div class="col col-left">
+        <section class="card pillars-card">
+          <header class="card-head">
+            <h2 class="card-title">사주 원국 <span class="sub">四柱</span></h2>
+            <span class="chip-line" id="chart-strength">-</span>
+          </header>
+          <div class="pillar-head">
+            <span>시</span><span>일</span><span>월</span><span>년</span>
+          </div>
+          <div class="pillars" id="pillars"></div>
+          <div class="pillar-foot">
+            <div class="foot-row"><span>지장간</span><b id="r-hidden">-</b></div>
+            <div class="foot-row"><span>십이운성</span><b id="r-stages">-</b></div>
+            <div class="foot-row"><span>공망</span><b id="r-gongmang">-</b></div>
+            <div class="foot-row"><span>신살</span><b id="r-sals">-</b></div>
+          </div>
+          <div class="daymaster">
+            <span class="dm-badge" id="dm-badge">乙</span>
+            <div>
+              <p class="dm-title" id="dm-title">-</p>
+              <p class="dm-body" id="dm-body">-</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card elements-card">
+          <header class="card-head">
+            <h2 class="card-title">오행 밸런스 <span class="sub">五行</span></h2>
+          </header>
+          <div class="elem-bars" id="elem-bars"></div>
+          <div class="group-pct" id="group-pct"></div>
+          <p class="para small" id="r-balance">-</p>
+        </section>
+
+        <section class="card keyword-card">
+          <header class="card-head">
+            <h2 class="card-title">2027 핵심 키워드</h2>
+          </header>
+          <div class="kw-list" id="kw-list"></div>
+          <p class="para" id="r-yearline">-</p>
+        </section>
+
+        <section class="card seun-card">
+          <header class="card-head">
+            <h2 class="card-title">2027 세운 <span class="sub">歲運</span></h2>
+            <span class="chip-line" id="seun-stage">-</span>
+          </header>
+          <div class="seun-row">
+            <div class="seun-chars">
+              <span class="seun-char" id="seun-s1">丁</span>
+              <span class="seun-char" id="seun-s2">未</span>
+            </div>
+            <div class="seun-gods" id="seun-gods"></div>
+          </div>
+          <div class="seun-rels" id="seun-rels"></div>
+          <p class="para small" id="r-seun">-</p>
+          <div class="block">
+            <h3>2027 정미년과 나의 조합</h3>
+            <p class="para small" id="r-year2027">-</p>
+          </div>
+        </section>
+
+        <section class="card daeun-card">
+          <header class="card-head">
+            <h2 class="card-title">대운 타임라인 <span class="sub">大運</span></h2>
+            <span class="chip-line" id="daeun-chip">-</span>
+          </header>
+          <div class="daeun-scroll" id="daeun-scroll" tabindex="0" aria-label="대운 흐름, 좌우로 스크롤">
+            <div class="daeun-track" id="daeun-track"></div>
+          </div>
+          <p class="para small" id="r-daeun">-</p>
+        </section>
+
+        <section class="card luck-card">
+          <header class="card-head">
+            <h2 class="card-title">2027 개운 처방 &amp; 균형 오행</h2>
+            <span class="chip-line" id="luck-chip">-</span>
+          </header>
+          <div class="luck-grid">
+            <div class="luck-cell yong">
+              <span class="luck-cell-label">용신 (부족한 기운)</span>
+              <b class="luck-cell-elem" id="luck-yong">-</b>
+              <span class="luck-cell-sub" id="luck-yong-sub">-</span>
+            </div>
+            <div class="luck-cell hui">
+              <span class="luck-cell-label">희신 (더하면 좋은 기운)</span>
+              <b class="luck-cell-elem" id="luck-hui">-</b>
+              <span class="luck-cell-sub" id="luck-hui-sub">-</span>
+            </div>
+          </div>
+          <div class="luck-rows">
+            <div class="luck-row"><span>행운 색</span><b id="luck-colors">-</b></div>
+            <div class="luck-row"><span>행운 방향</span><b id="luck-dir">-</b></div>
+            <div class="luck-row"><span>애용할 숫자</span><b id="luck-nums">-</b></div>
+            <div class="luck-row"><span>직무 키워드</span><b id="luck-jobs">-</b></div>
+          </div>
+          <div class="block">
+            <h3>일상 처방</h3>
+            <p class="para small" id="luck-routines">-</p>
+          </div>
+          <p class="para small" id="r-luck">-</p>
+        </section>
+
+        <div class="halves">
+          <section class="card half-card">
+            <h3><span class="half-mark">上</span> 상반기</h3>
+            <p class="para small" id="r-half1">-</p>
+          </section>
+          <section class="card half-card">
+            <h3><span class="half-mark">下</span> 하반기</h3>
+            <p class="para small" id="r-half2">-</p>
+          </section>
+        </div>
+      </div>
+
+      <!-- 오른쪽 열 -->
+      <div class="col col-right">
+        <div class="lock-zone" id="lock-zone">
+          <div class="lock-teaser">
+            <span class="lock-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18"><path d="M7 10V8a5 5 0 0 1 10 0v2M6 10h12v10H6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            </span>
+            <div class="lock-copy">
+              <p class="lock-title">재물운 · 취업운 · 월별 로드맵</p>
+              <p class="lock-sub"><s>₩3,900</s> 상당 무료 미리보기</p>
+            </div>
+            <button type="button" class="cta cta-small" id="unlock-btn">체험용 잠금 해제</button>
+          </div>
+
+          <div class="locked-body" id="locked-body">
+            <section class="card money-card">
+              <header class="card-head">
+                <h2 class="card-title">2027 재물운 <span class="sub">財</span></h2>
+                <span class="chip-line" id="money-score">-</span>
+              </header>
+              <div class="block">
+                <h3>현금 흐름</h3>
+                <p class="para small" id="r-cashflow">-</p>
+              </div>
+              <div class="block">
+                <h3>부업 · 투자 타이밍</h3>
+                <p class="para small" id="r-timing">-</p>
+              </div>
+              <div class="block warn">
+                <h3>조심할 시기</h3>
+                <p class="para small" id="r-caution">-</p>
+              </div>
+            </section>
+
+            <section class="card career-card">
+              <header class="card-head">
+                <h2 class="card-title">2027 취업 · 이직 · 진로 <span class="sub">職</span></h2>
+                <span class="chip-line" id="career-score">-</span>
+              </header>
+              <div class="block">
+                <h3>합격 · 성과 운이 강한 달</h3>
+                <p class="para small" id="r-peak">-</p>
+              </div>
+              <div class="block">
+                <h3>잘 맞는 일하는 방식</h3>
+                <p class="para small" id="r-style">-</p>
+              </div>
+              <div class="block">
+                <h3>실전 조언</h3>
+                <p class="para small" id="r-advice">-</p>
+              </div>
+            </section>
+
+            <section class="card months-card">
+              <header class="card-head">
+                <h2 class="card-title">2027 월별 로드맵 <span class="sub">1~12월</span></h2>
+              </header>
+              <div class="months" id="months"></div>
+            </section>
+          </div>
+
+          <div class="paywall" id="paywall">
+            <p class="paywall-note">잠금 해제 후 전체 열람</p>
+          </div>
+        </div>
+
+        <section class="card share-card">
+          <h2 class="card-title">결과 공유</h2>
+          <p class="para small">요약 카드를 이미지로 저장하거나, 링크와 한 줄 요약을 복사해 공유해 보세요.</p>
+          <div class="share-actions">
+            <button type="button" class="ghost-btn" id="preview-card">미리보기</button>
+            <button type="button" class="ghost-btn" id="save-card">이미지로 저장</button>
+          </div>
+          <div class="share-actions">
+            <button type="button" class="ghost-btn" id="copy-link">결과 링크 복사</button>
+            <button type="button" class="ghost-btn" id="copy-summary">한 줄 요약 복사</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="result-foot">
+      <button type="button" class="ghost-btn" data-go="home">← 다른 생년월일로 보기</button>
+      <p class="fineprint">
+        사주 계산은 한국천문연구원 음양력·절기 기준의 만세력 로직을 사용했습니다.
+        일주는 자정(00:00)에 바뀌며, 절입 시각은 천문 계산값으로 발표값과 수 분의 차이가 있을 수 있습니다.
+        본 리포트는 재미와 참고를 위한 것이며, 투자·취업 등 실제 결정의 근거가 아닙니다.
+      </p>
+    </div>
+  </section>
+</main>
+
+<!-- 카드 미리보기 모달 -->
+<div class="modal" id="modal" hidden>
+  <div class="modal-back" data-close></div>
+  <div class="modal-body">
+    <img id="card-img" alt="2027 신년운세 요약 카드">
+    <div class="modal-actions">
+      <button type="button" class="ghost-btn" data-close>닫기</button>
+      <a class="cta cta-small" id="download-card" download="saju2027-card.png">이미지 저장</a>
+    </div>
+  </div>
+</div>
+
+<!-- 복사 토스트 -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/js/lunar-data.js"></script>
+<script src="assets/js/astro.js"></script>
+<script src="assets/js/saju.js"></script>
+<script src="assets/js/report.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

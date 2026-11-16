@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>사주 엔진 검증</title>
+<style>
+  body { font-family: system-ui, "Noto Sans KR", sans-serif; background:#0d1220; color:#e8e8ee; padding:24px; }
+  h1 { font-size:18px; }
+  table { border-collapse: collapse; font-size:13px; }
+  td, th { border-bottom:1px solid #2a3348; padding:4px 10px; text-align:left; }
+  .pass { color:#5ecf9b; } .fail { color:#ff7a7a; font-weight:700; }
+  #summary { font-size:15px; margin:12px 0; }
+</style>
+</head>
+<body>
+<h1>사주 엔진 자체 검증</h1>
+<div id="summary"></div>
+<table id="out"><thead><tr><th>#</th><th>검사</th><th>기대값</th><th>실제값</th><th>결과</th></tr></thead><tbody></tbody></table>
+<script src="../assets/js/lunar-data.js"></script>
+<script src="../assets/js/astro.js"></script>
+<script src="../assets/js/saju.js"></script>
+<script>
+(function () {
+  var results = [];
+  function check(name, expected, actual) {
+    var ok = JSON.stringify(expected) === JSON.stringify(actual);
+    results.push({ name: name, expected: expected, actual: actual, ok: ok });
+  }
+  function near(name, expected, actual, tol) {
+    var ok = Math.abs(expected - actual) <= tol;
+    results.push({ name: name, expected: expected, actual: actual, ok: ok });
+  }
+  function hhmm(t) { return ("0" + t.h).slice(-2) + ":" + ("0" + t.mi).slice(-2); }
+
+  /* 1. 음양력 변환 */
+  var s1 = Astro.solarToLunar(1998, 5, 8);
+  check("양력 1998-05-08 → 음력", [1998, 4, 13, false], [s1.year, s1.month, s1.day, s1.leap]);
+  var s2 = Astro.solarToLunar(1998, 6, 28);
+  check("양력 1998-06-28 → 음력(윤달)", [1998, 5, 5, true], [s2.year, s2.month, s2.day, s2.leap]);
+  var s3 = Astro.lunarToSolar(2027, 1, 1, false);
+  check("음력 2027-01-01 → 양력(설날)", [2027, 2, 7], [s3.y, s3.m, s3.d]);
+  var s4 = Astro.lunarToSolar(1998, 5, 5, true);
+  check("음력 1998 윤5-05 → 양력", [1998, 6, 28], [s4.y, s4.m, s4.d]);
+
+  /* 왕복 변환 500건 (1902~2048) */
+  var rtFail = [];
+  for (var i = 0; i < 500; i++) {
+    var y = 1902 + Math.floor(Math.random() * 146);
+    var m = 1 + Math.floor(Math.random() * 12);
+    var d = 1 + Math.floor(Math.random() * 28);
+    var L = Astro.solarToLunar(y, m, d);
+    if (!L) { rtFail.push([y, m, d, null]); continue; }
+    var back = Astro.lunarToSolar(L.year, L.month, L.day, L.leap);
+    if (!back || back.y !== y || back.m !== m || back.d !== d) rtFail.push([y, m, d, back]);
+  }
+  check("음↔양 왕복 500건 불일치", 0, rtFail.length);
+
+  /* 2. 24절기 시각 (한국천문연구원 발표값) */
+  var t98 = Astro.termsInYear(1998);
+  function md(t) { return ("0" + t.kst.m).slice(-2) + "-" + ("0" + t.kst.d).slice(-2); }
+  function toMin(t) { return t.kst.h * 60 + t.kst.mi; }
+  var ipha = t98.filter(function (t) { return t.name === '입하'; })[0];
+  check("1998 입하 날짜", "05-06", md(ipha));
+  near("1998 입하 시각 오차(분, 발표 02:03)", 0, toMin(ipha) - (2 * 60 + 3), 8);
+  var soman = t98.filter(function (t) { return t.name === '소만'; })[0];
+  check("1998 소만 날짜", "05-21", md(soman));
+  near("1998 소만 시각 오차(분, 발표 15:05)", 0, toMin(soman) - (15 * 60 + 5), 8);
+  var ipchun98 = t98.filter(function (t) { return t.name === '입춘'; })[0];
+  check("1998 입춘 날짜", "02-04", md(ipchun98));
+
+  /* 2027년 24절기 날짜 (한국천문연구원 발표값) — 달이 바뀌는지가 중요 */
+  var t27 = Astro.termsInYear(2027);
+  var expect2027 = {
+    '소한': '01-05', '대한': '01-20', '입춘': '02-04', '우수': '02-19', '경칩': '03-06', '춘분': '03-21',
+    '청명': '04-05', '곡우': '04-20', '입하': '05-06', '소만': '05-21', '망종': '06-06', '하지': '06-21',
+    '소서': '07-07', '대서': '07-23', '입추': '08-08', '처서': '08-23', '백로': '09-08', '추분': '09-23',
+    '한로': '10-08', '상강': '10-24', '입동': '11-08', '소설': '11-22', '대설': '12-07', '동지': '12-22'
+  };
+  var badDates = t27.filter(function (t) { return expect2027[t.name] !== md(t); })
+    .map(function (t) { return t.name + ':' + md(t) + '≠' + expect2027[t.name]; });
+  check("2027 24절기 날짜 24건", [], badDates);
+  var maxErr = Math.max.apply(null, t27.map(function (t) {
+    var pub = { '소한': '23:10', '대한': '16:30', '입춘': '10:46', '우수': '06:34', '경칩': '04:39', '춘분': '05:25',
+      '청명': '09:17', '곡우': '16:17', '입하': '02:25', '소만': '15:18', '망종': '06:25', '하지': '23:11',
+      '소서': '16:37', '대서': '10:04', '입추': '02:26', '처서': '17:14', '백로': '05:28', '추분': '15:01',
+      '한로': '21:17', '상강': '00:33', '입동': '00:39', '소설': '22:16', '대설': '17:38', '동지': '11:42' }[t.name];
+    var p = pub.split(':');
+    return Math.abs(toMin(t) - (Number(p[0]) * 60 + Number(p[1])));
+  }));
+  near("2027 절기 시각 최대 오차(분)", true, maxErr <= 10, 0);
+
+  /* 3. 사주 산출 — 1998-05-08 12:00 (오시) */
+  var c = Saju.computeChart({ calendar: 'solar', year: 1998, month: 5, day: 8, siIndex: 6, gender: 'male' });
+  var P = c.pillars;
+  check("1998-05-08 12:00 사주팔자",
+    "戊寅 丁巳 乙卯 壬午",
+    [Saju.STEM_HAN[P.year.stem] + Saju.BRANCH_HAN[P.year.branch],
+     Saju.STEM_HAN[P.month.stem] + Saju.BRANCH_HAN[P.month.branch],
+     Saju.STEM_HAN[P.day.stem] + Saju.BRANCH_HAN[P.day.branch],
+     Saju.STEM_HAN[P.hour.stem] + Saju.BRANCH_HAN[P.hour.branch]].join(' '));
+  check("1998-05-08 일주", "乙卯", Saju.STEM_HAN[P.day.stem] + Saju.BRANCH_HAN[P.day.branch]);
+  check("1998-05-08 월주", "丁巳", Saju.STEM_HAN[P.month.stem] + Saju.BRANCH_HAN[P.month.branch]);
+  check("1998-05-08 음력 표기", "1998-4-13", c.lunar.y + "-" + c.lunar.m + "-" + c.lunar.d);
+
+  /* 4. 절입 경계 — 입하(5/6 02:03) 전후 */
+  var before = Saju.computeChart({ calendar: 'solar', year: 1998, month: 5, day: 5, siIndex: 6, gender: 'male' });
+  check("1998-05-05 월주(입하 전)", "丙辰", Saju.STEM_HAN[before.pillars.month.stem] + Saju.BRANCH_HAN[before.pillars.month.branch]);
+  var after = Saju.computeChart({ calendar: 'solar', year: 1998, month: 5, day: 7, siIndex: 6, gender: 'male' });
+  check("1998-05-07 월주(입하 후)", "丁巳", Saju.STEM_HAN[after.pillars.month.stem] + Saju.BRANCH_HAN[after.pillars.month.branch]);
+
+  /* 5. 입춘 경계 — 년주 */
+  var feb3 = Saju.computeChart({ calendar: 'solar', year: 1998, month: 2, day: 3, siIndex: 6, gender: 'male' });
+  check("1998-02-03 년주(입춘 전)", "丁丑", Saju.STEM_HAN[feb3.pillars.year.stem] + Saju.BRANCH_HAN[feb3.pillars.year.branch]);
+  var feb5 = Saju.computeChart({ calendar: 'solar', year: 1998, month: 2, day: 5, siIndex: 6, gender: 'male' });
+  check("1998-02-05 년주(입춘 후)", "戊寅", Saju.STEM_HAN[feb5.pillars.year.stem] + Saju.BRANCH_HAN[feb5.pillars.year.branch]);
+
+  /* 5-1. 일진 검증 (공개 만세력 표와 대조) */
+  function dayPillar(y, m, d) {
+    var cc = Saju.computeChart({ calendar: 'solar', year: y, month: m, day: d, siIndex: null, gender: 'male' });
+    return Saju.STEM_HAN[cc.pillars.day.stem] + Saju.BRANCH_HAN[cc.pillars.day.branch];
+  }
+  check("일진 1998-05-06", "癸丑", dayPillar(1998, 5, 6));
+  check("일진 1998-05-31", "戊寅", dayPillar(1998, 5, 31));
+  check("일진 2026-11-16", "甲午", dayPillar(2026, 11, 16));
+  check("일진 2027-01-01", "庚辰", dayPillar(2027, 1, 1));
+  check("일진 2027-02-07", "丁巳", dayPillar(2027, 2, 7));
+  check("일진 2027-05-06", "乙酉", dayPillar(2027, 5, 6));
+
+  /* 6. 2000-01-01 자시 */
+  var c2 = Saju.computeChart({ calendar: 'solar', year: 2000, month: 1, day: 1, siIndex: 0, gender: 'female' });
+  var P2 = c2.pillars;
+  check("2000-01-01 자시 사주",
+    "己卯 丙子 戊午 壬子",
+    [P2.year, P2.month, P2.day, P2.hour].map(function (p) {
+      return Saju.STEM_HAN[p.stem] + Saju.BRANCH_HAN[p.branch];
+    }).join(' '));
+
+  /* 7. 시진별 시주 규칙 (을일) */
+  var seq = [];
+  for (var si = 0; si < 12; si++) {
+    var cc = Saju.computeChart({ calendar: 'solar', year: 1998, month: 5, day: 8, siIndex: si, gender: 'male' });
+    seq.push(Saju.STEM_HAN[cc.pillars.hour.stem] + Saju.BRANCH_HAN[cc.pillars.hour.branch]);
+  }
+  check("을일 12시진 시주", "丙子 丁丑 戊寅 己卯 庚辰 辛巳 壬午 癸未 甲申 乙酉 丙戌 丁亥", seq.join(' '));
+
+  /* 8. 십성 규칙 */
+  function ts(day, other) { return Saju.tenGod(day, other); }
+  check("을일 vs 정(丁)", "식신", ts(1, 3));
+  check("갑일 vs 정(丁)", "상관", ts(0, 3));
+  check("을일 vs 기(己)", "편재", ts(1, 5));
+  check("갑일 vs 기(己)", "정재", ts(0, 5));
+  check("을일 vs 무(戊)", "정재", ts(1, 4));
+  check("갑일 vs 신(辛)", "정관", ts(0, 7));
+  check("경일 vs 정(丁)", "정관", ts(6, 3));
+  check("임일 vs 정(丁)", "정재", ts(8, 3));
+  check("무일 vs 정(丁)", "정인", ts(4, 3));
+  check("병일 vs 정(丁)", "겁재", ts(2, 3));
+
+  /* 9. 십이운성 */
+  check("갑일 인지", "임관", Saju.stageOf(0, 2));
+  check("을일 오지", "장생", Saju.stageOf(1, 6));
+  check("병일 인지", "장생", Saju.stageOf(2, 2));
+
+  /* 10. 오행 합계 */
+  var sum = c.elements.counts.reduce(function (a, b) { return a + b; }, 0);
+  check("오행 글자 수 합", 8, sum);
+  var pctSum = c.elements.percents.reduce(function (a, b) { return a + b; }, 0);
+  near("오행 비율 합(100)", 100, pctSum, 0.5);
+
+  /* 11. 2027 세운 */
+  check("2027 세운 간지", "丁未", c.seun.han);
+  check("을일의 2027 천간 십성", "식신", c.seun.stemGod);
+  check("2027 월별 12개", 12, c.months2027.length);
+  check("2027년 1월 월주(정미년 입춘 전=병오년 축월)", "辛丑",
+    Saju.STEM_HAN[c.months2027[0].stem] + Saju.BRANCH_HAN[c.months2027[0].branch]);
+  check("2027년 3월 월주", "癸卯", Saju.STEM_HAN[c.months2027[2].stem] + Saju.BRANCH_HAN[c.months2027[2].branch]);
+  check("2027년 7월 월주(정미년 미월)", "丁未", Saju.STEM_HAN[c.months2027[6].stem] + Saju.BRANCH_HAN[c.months2027[6].branch]);
+
+  /* 12. 시 모름 처리 */
+  var noHour = Saju.computeChart({ calendar: 'solar', year: 1998, month: 5, day: 8, siIndex: null, gender: 'male' });
+  check("시 모름 → 시주 없음", null, noHour.pillars.hour);
+  check("시 모름 → 글자 수 6", 6, noHour.elements.total);
+
+  /* 13. 대운 — 순행/역행 · 대운수 · 기둥 배열 · 2027 현재 대운 */
+  // 남 1998-05-08: 양년생(戊) 남자 → 순행. 월주 丁巳. 다음 절입 망종(6/6)까지 약 28.7일 → 대운수 10
+  var d1 = c.daeun;
+  check("대운 방향 (양남 순행)", true, d1.forward);
+  check("대운 방향 표기", "순행", d1.directionKo);
+  check("대운수 (남 1998-05-08, 망종까지)", 10, d1.daeunSu);
+  check("대운 1·2·3번째 기둥", "戊午 己未 庚申",
+    d1.pillars.slice(0, 3).map(function (p) { return p.han; }).join(' '));
+  check("대운 기둥 수", 10, d1.pillars.length);
+  check("대운 1번째 나이 구간", [10, 19], [d1.pillars[0].startAge, d1.pillars[0].endAge]);
+  check("대운 천간 십성 (을일 기준 戊)", "정재", d1.pillars[0].god);
+  check("2027 현재 대운 (만 29세 → 己未 20~29)", "己未", c.currentDaeun.han);
+  check("2027 현재 대운 십성 (을일 기준 己)", "편재", c.currentDaeun.god);
+
+  // 여 1998-05-08: 양년생(戊) 여자 → 역행. 이전 절입 입하(5/6)까지 약 2.4일 → 대운수 1
+  var f98 = Saju.computeChart({ calendar: 'solar', year: 1998, month: 5, day: 8, siIndex: 6, gender: 'female' });
+  var d2 = f98.daeun;
+  check("대운 방향 (양녀 역행)", false, d2.forward);
+  check("대운수 (여 1998-05-08, 입하까지)", 1, d2.daeunSu);
+  check("대운 1번째 기둥 (역행)", "丙辰", d2.pillars[0].han);
+  check("2027 현재 대운 (여, 甲寅 21~30)", "甲寅", f98.currentDaeun.han);
+
+  // 여 2000-01-01 자시: 음년생(己) 여자 → 순행. 다음 절입 소한(1/6 09:56)까지 약 4.5일 → 대운수 1
+  var d3 = c2.daeun;
+  check("대운 방향 (음녀 순행)", true, d3.forward);
+  check("대운수 (여 2000-01-01, 소한까지)", 1, d3.daeunSu);
+  check("대운 1번째 기둥 (丙子월 → 순행 丁丑)", "丁丑", d3.pillars[0].han);
+
+  // 여 1997-08-15: 음년생(丁) 여자 → 순행. 월주 戊申, 다음 절입 백로 → 대운수 8
+  var c97 = Saju.computeChart({ calendar: 'solar', year: 1997, month: 8, day: 15, siIndex: 3, gender: 'female' });
+  check("대운 방향 (음녀 순행)", true, c97.daeun.forward);
+  check("대운수 (여 1997-08-15, 백로까지)", 8, c97.daeun.daeunSu);
+  check("대운 1번째 기둥 (戊申월 → 순행 己酉)", "己酉", c97.daeun.pillars[0].han);
+
+  // 대운수는 0 이상이어야 하고, 나이 구간이 10년 주기로 이어져야 함
+  var stageOk = d1.pillars.every(function (p, i) {
+    return p.startAge === d1.daeunSu + i * 10 && p.endAge === p.startAge + 9;
+  });
+  check("대운 나이 구간 10년 주기", true, stageOk);
+
+  /* 렌더 */
+  var pass = results.filter(function (r) { return r.ok; }).length;
+  document.getElementById('summary').innerHTML =
+    '<b class="' + (pass === results.length ? 'pass' : 'fail') + '">' + pass + ' / ' + results.length + ' 통과</b>';
+  var tb = document.querySelector('#out tbody');
+  results.forEach(function (r, i) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + r.name + '</td><td>' + JSON.stringify(r.expected) +
+      '</td><td>' + JSON.stringify(r.actual) + '</td><td class="' + (r.ok ? 'pass' : 'fail') + '">' +
+      (r.ok ? 'PASS' : 'FAIL') + '</td>';
+    tb.appendChild(tr);
+  });
+  window.__RESULTS = { pass: pass, total: results.length, results: results };
+})();
+</script>
+</body>
+</html>
