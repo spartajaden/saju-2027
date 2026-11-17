@@ -260,6 +260,25 @@ select {
 }
 .features b { color: var(--text-dim); font-weight: 600; margin-right: 4px; }
 
+/* ============ 방문자 수 (조용한 푸터 표시) ============ */
+.visit-count {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  margin: 18px 0 0; font-size: 11.5px; line-height: 1.5;
+  color: #7B8296; letter-spacing: -.005em; text-align: center;
+}
+.visit-count[hidden] { display: none; }
+.visit-glyph {
+  flex: none; width: 17px; height: 17px; display: grid; place-items: center;
+  font-family: var(--font-serif); font-size: 10px; line-height: 1;
+  color: var(--gold); border: 1px solid rgba(214, 178, 90, .22); border-radius: 5px;
+  background: rgba(214, 178, 90, .055);
+}
+.visit-num {
+  font-size: 12px; font-weight: 600; color: var(--gold-bright);
+  font-variant-numeric: tabular-nums; letter-spacing: .015em;
+}
+.visit-count--foot { margin: 0; }
+
 /* ============ 로딩 ============ */
 .loading { text-align: center; padding: 18vh 0 0; }
 .loading-orb {
@@ -506,6 +525,7 @@ select {
 .ghost-btn:hover { background: rgba(214, 178, 90, .1); color: var(--gold-bright); border-color: rgba(214, 178, 90, .3); }
 
 .result-foot { margin-top: 22px; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.result-foot .visit-count { gap: 6px; }
 .result-foot .ghost-btn { flex: none; padding: 0 20px; }
 .fineprint {
   margin: 0; font-size: 10.5px; line-height: 1.75; color: #5F6678; text-align: center;
