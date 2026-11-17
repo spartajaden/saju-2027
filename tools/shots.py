@@ -37,17 +37,12 @@ def main():
             m.screenshot(path=str(out / "home-mobile.png"))
             m.screenshot(path=str(out / "home-mobile-full.png"), full_page=True)
 
-            # --- 2) 모바일 결과 (잠금 상태) ---
+            # --- 2) 모바일 결과 (전체 열람) ---
             m.evaluate("""() => window.__saju.submit({name:'최재화', gender:'male', year:1998, month:5, day:8, si:6})""")
             m.wait_for_selector("#view-result.is-active", timeout=15000)
             m.wait_for_timeout(1200)
-            m.screenshot(path=str(out / "result-mobile-locked.png"))
-            m.screenshot(path=str(out / "result-mobile-locked-full.png"), full_page=True)
-
-            # --- 3) 모바일 결과 (잠금 해제) ---
-            m.click("#unlock-btn")
-            m.wait_for_timeout(900)
-            m.screenshot(path=str(out / "result-mobile-open-full.png"), full_page=True)
+            m.screenshot(path=str(out / "result-mobile-top.png"))
+            m.screenshot(path=str(out / "result-mobile-full.png"), full_page=True)
 
             # --- 4) 카드 미리보기 모달 ---
             m.evaluate("window.__saju.openCard(false)")
@@ -63,10 +58,7 @@ def main():
             d.evaluate("""() => window.__saju.submit({name:'최재화', gender:'male', year:1998, month:5, day:8, si:6})""")
             d.wait_for_selector("#view-result.is-active", timeout=15000)
             d.wait_for_timeout(1000)
-            d.screenshot(path=str(out / "result-desktop-locked.png"), full_page=True)
-            d.click("#unlock-btn")
-            d.wait_for_timeout(900)
-            d.screenshot(path=str(out / "result-desktop-open.png"), full_page=True)
+            d.screenshot(path=str(out / "result-desktop-full.png"), full_page=True)
 
             browser.close()
     finally:

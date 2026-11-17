@@ -58,14 +58,24 @@ def main():
                     name: t('r-name'), balance: t('r-balance').length
                   };
                 }""")
-                # 잠금 해제도 확인
-                pg.click("#unlock-btn")
-                pg.wait_for_timeout(120)
-                opened = pg.evaluate("document.getElementById('lock-zone').classList.contains('is-open')")
+                # 전체 리포트가 잠금 없이 바로 보여야 한다
+                full = pg.evaluate("""() => {
+                  const paywall = document.querySelector('.paywall, #lock-zone, #locked-body, .unlocked-badge, #unlock-btn');
+                  const card = document.querySelector('.money-card');
+                  const cs = card ? getComputedStyle(card) : null;
+                  return {
+                    lockedUi: !!paywall,
+                    blur: cs ? cs.filter : '',
+                    money: (document.getElementById('money-score').textContent || '').trim().length,
+                    months: document.querySelectorAll('#months .month').length,
+                    trial: document.body.innerText.includes('체험')
+                  };
+                }""")
+                opened = not full['lockedUi'] and full['blur'] in ('none', '') and full['money'] > 0 and not full['trial']
                 print(f"{label:22s} | {info['meta'][:44]:44s} | 기둥 {info['pillars']} (모름 {info['empty']}) "
-                      f"| 키워드 {info['kw']} 월 {info['months']} | 해제 {opened} | 오류 {len(errors)}")
+                      f"| 키워드 {info['kw']} 월 {info['months']} | 잠금없음 {opened} | 오류 {len(errors)}")
                 if info["kw"] != 3 or info["months"] != 12 or not info["cash"] or not info["seun"] or not opened:
-                    FAILED.append((label, info))
+                    FAILED.append((label, info, full))
                 if errors:
                     FAILED.append((label, errors[:2]))
 

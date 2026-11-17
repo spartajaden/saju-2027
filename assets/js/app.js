@@ -1,5 +1,5 @@
 /* ===========================================================================
-   app.js — 화면 조립 · 입력 · 잠금 해제 · 결과 카드
+   app.js — 화면 조립 · 입력 · 결과 카드
    =========================================================================== */
 (function () {
   'use strict';
@@ -22,7 +22,7 @@
   ];
   var SI_LABEL = ['자시', '축시', '인시', '묘시', '진시', '사시', '오시', '미시', '신시', '유시', '술시', '해시'];
 
-  var state = { gender: 'male', calendar: 'solar', chart: null, report: null, unlocked: false };
+  var state = { gender: 'male', calendar: 'solar', chart: null, report: null };
   var $ = function (id) { return document.getElementById(id); };
 
   /* ---------- 초기화 ---------- */
@@ -103,7 +103,6 @@
     $('year').addEventListener('change', function () { fillDays(); updateLeap(); });
     $('month').addEventListener('change', function () { fillDays(); });
     $('saju-form').addEventListener('submit', onSubmit);
-    $('unlock-btn').addEventListener('click', unlock);
     $('preview-card').addEventListener('click', function () { openCard(false); });
     $('save-card').addEventListener('click', function () { openCard(true); });
     $('copy-link').addEventListener('click', copyLink);
@@ -215,7 +214,6 @@
     saveInput(input);
     state.chart = chart;
     state.report = R.build(chart);
-    state.unlocked = false;
     try { history.replaceState(null, '', encodeInput(input)); } catch (e) {}
 
     showView('loading');
@@ -295,12 +293,6 @@
     $('career-score').textContent = '관성 ' + Math.round(r.natal.off) + '%';
 
     renderMonths(r);
-
-    // 잠금 상태 초기화
-    var zone = $('lock-zone');
-    zone.classList.remove('is-open');
-    var badge = zone.querySelector('.unlocked-badge');
-    if (badge) badge.remove();
   }
 
   function renderPillars(c) {
@@ -486,20 +478,6 @@
     });
   }
 
-  /* ---------- 잠금 해제 ---------- */
-  function unlock() {
-    state.unlocked = true;
-    var zone = $('lock-zone');
-    var body = $('locked-body');
-    if (!zone.querySelector('.unlocked-badge')) {
-      var b = document.createElement('div');
-      b.className = 'unlocked-badge';
-      b.innerHTML = '🔓 <b>체험 모드</b> · 실제 서비스에서는 ₩3,900 결제 후 열리는 영역입니다';
-      body.insertBefore(b, body.firstChild);
-    }
-    zone.classList.add('is-open');
-  }
-
   /* ---------- 결과 카드 ---------- */
   function drawCard() {
     var c = state.chart, r = state.report;
@@ -653,7 +631,6 @@
       $('si').value = opts.si === null || opts.si === undefined ? 'unknown' : opts.si;
       $('saju-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
     },
-    unlock: unlock,
     openCard: openCard
   };
 
@@ -669,7 +646,6 @@
         year: shared.year, month: shared.month, day: shared.day,
         leap: shared.leap, si: shared.siIndex
       });
-      i.unlock();
     }, 50);
   });
 })();

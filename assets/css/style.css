@@ -452,65 +452,6 @@ select {
   border: 1px solid rgba(214, 178, 90, .22);
 }
 
-/* ============ 잠금 영역 ============ */
-.lock-zone { position: relative; }
-.lock-teaser {
-  position: relative; z-index: 2;
-  display: flex; align-items: center; gap: 11px;
-  padding: 13px 14px; margin-bottom: 12px;
-  border-radius: 16px;
-  background: linear-gradient(120deg, rgba(214, 178, 90, .16), rgba(214, 178, 90, .05) 60%, rgba(99, 195, 166, .07));
-  border: 1px solid rgba(214, 178, 90, .3);
-  box-shadow: 0 18px 40px -30px rgba(214, 178, 90, .9);
-}
-.lock-icon {
-  flex: none; width: 34px; height: 34px; display: grid; place-items: center;
-  border-radius: 11px; color: var(--gold-bright);
-  background: rgba(214, 178, 90, .14); border: 1px solid rgba(214, 178, 90, .26);
-}
-.lock-copy { flex: 1 1 auto; min-width: 0; }
-.lock-title { margin: 0 0 2px; font-size: 12.5px; font-weight: 600; color: var(--text); }
-.lock-sub { margin: 0; font-size: 11px; color: var(--muted); }
-.lock-sub s { opacity: .6; }
-.lock-sub b { color: var(--gold-bright); font-weight: 600; }
-
-.locked-body {
-  filter: blur(5px) saturate(.85);
-  opacity: .72;
-  pointer-events: none;
-  user-select: none;
-  max-height: 640px;
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 55%, rgba(0, 0, 0, .25) 88%, transparent 100%);
-  mask-image: linear-gradient(180deg, #000 0%, #000 55%, rgba(0, 0, 0, .25) 88%, transparent 100%);
-  transition: filter .5s, opacity .5s, max-height .5s;
-}
-.locked-body > .card + .card { margin-top: 14px; }
-.paywall {
-  position: absolute; left: 0; right: 0; bottom: -6px; z-index: 3;
-  text-align: center; pointer-events: none;
-}
-.paywall-note {
-  display: inline-block; margin: 0; font-size: 11px; color: var(--muted);
-  letter-spacing: .04em; padding: 6px 14px; border-radius: 999px;
-  background: rgba(8, 11, 20, .82); border: 1px solid var(--line-soft);
-  backdrop-filter: blur(6px);
-}
-.lock-zone.is-open .lock-teaser { display: none; }
-.lock-zone.is-open .locked-body {
-  filter: none; opacity: 1; pointer-events: auto; user-select: auto;
-  max-height: none;
-  -webkit-mask-image: none; mask-image: none;
-}
-.lock-zone.is-open .paywall { display: none; }
-.unlocked-badge {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 11px; color: var(--jade); margin-bottom: 12px;
-  padding: 8px 12px; border-radius: 11px;
-  background: rgba(99, 195, 166, .08); border: 1px solid rgba(99, 195, 166, .22);
-}
-.unlocked-badge b { color: #9FE3CD; font-weight: 600; }
-
 /* 블록 */
 .block + .block { margin-top: 14px; padding-top: 13px; border-top: 1px dashed rgba(255, 255, 255, .075); }
 .block h3 {
@@ -738,7 +679,6 @@ select {
   .result-name { font-size: 32px; }
   .pillar .han { font-size: 34px; }
   .pillar .god { font-size: 10.5px; }
-  .locked-body { max-height: 760px; }
   .hero-card-top { align-items: center; }
   .hero-card-line { font-size: 19px; }
   .daeun-track { gap: 9px; }
@@ -773,12 +713,7 @@ select {
   .form-foot { margin-top: 9px; }
   .features { margin-top: 16px; }
 
-  .lock-teaser { padding: 11px 12px; gap: 9px; }
-  .lock-icon { width: 30px; height: 30px; border-radius: 9px; }
-  .lock-title { font-size: 12px; }
-  .lock-sub { font-size: 10.5px; }
   .cta-small { height: 38px; padding: 0 13px; font-size: 12.5px; }
-  .locked-body { max-height: 360px; }
   .halves { gap: 10px; }
   .hero-card { padding: 16px; }
   .hero-card-line { font-size: 15.5px; }

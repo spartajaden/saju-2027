@@ -85,7 +85,7 @@
         <span>2027년 운세 보기</span>
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <p class="form-foot">입력한 정보는 브라우저 안에서만 계산됩니다 · 무료 미리보기 제공</p>
+      <p class="form-foot">입력한 정보는 브라우저 안에서만 계산됩니다 · 전체 리포트 무료 열람</p>
     </form>
 
     <ul class="features">
@@ -262,69 +262,50 @@
 
       <!-- 오른쪽 열 -->
       <div class="col col-right">
-        <div class="lock-zone" id="lock-zone">
-          <div class="lock-teaser">
-            <span class="lock-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="18" height="18"><path d="M7 10V8a5 5 0 0 1 10 0v2M6 10h12v10H6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-            </span>
-            <div class="lock-copy">
-              <p class="lock-title">재물운 · 취업운 · 월별 로드맵</p>
-              <p class="lock-sub"><s>₩3,900</s> 상당 무료 미리보기</p>
-            </div>
-            <button type="button" class="cta cta-small" id="unlock-btn">체험용 잠금 해제</button>
+        <section class="card money-card">
+          <header class="card-head">
+            <h2 class="card-title">2027 재물운 <span class="sub">財</span></h2>
+            <span class="chip-line" id="money-score">-</span>
+          </header>
+          <div class="block">
+            <h3>현금 흐름</h3>
+            <p class="para small" id="r-cashflow">-</p>
           </div>
-
-          <div class="locked-body" id="locked-body">
-            <section class="card money-card">
-              <header class="card-head">
-                <h2 class="card-title">2027 재물운 <span class="sub">財</span></h2>
-                <span class="chip-line" id="money-score">-</span>
-              </header>
-              <div class="block">
-                <h3>현금 흐름</h3>
-                <p class="para small" id="r-cashflow">-</p>
-              </div>
-              <div class="block">
-                <h3>부업 · 투자 타이밍</h3>
-                <p class="para small" id="r-timing">-</p>
-              </div>
-              <div class="block warn">
-                <h3>조심할 시기</h3>
-                <p class="para small" id="r-caution">-</p>
-              </div>
-            </section>
-
-            <section class="card career-card">
-              <header class="card-head">
-                <h2 class="card-title">2027 취업 · 이직 · 진로 <span class="sub">職</span></h2>
-                <span class="chip-line" id="career-score">-</span>
-              </header>
-              <div class="block">
-                <h3>합격 · 성과 운이 강한 달</h3>
-                <p class="para small" id="r-peak">-</p>
-              </div>
-              <div class="block">
-                <h3>잘 맞는 일하는 방식</h3>
-                <p class="para small" id="r-style">-</p>
-              </div>
-              <div class="block">
-                <h3>실전 조언</h3>
-                <p class="para small" id="r-advice">-</p>
-              </div>
-            </section>
-
-            <section class="card months-card">
-              <header class="card-head">
-                <h2 class="card-title">2027 월별 로드맵 <span class="sub">1~12월</span></h2>
-              </header>
-              <div class="months" id="months"></div>
-            </section>
+          <div class="block">
+            <h3>부업 · 투자 타이밍</h3>
+            <p class="para small" id="r-timing">-</p>
           </div>
-
-          <div class="paywall" id="paywall">
-            <p class="paywall-note">잠금 해제 후 전체 열람</p>
+          <div class="block warn">
+            <h3>조심할 시기</h3>
+            <p class="para small" id="r-caution">-</p>
           </div>
-        </div>
+        </section>
+
+        <section class="card career-card">
+          <header class="card-head">
+            <h2 class="card-title">2027 취업 · 이직 · 진로 <span class="sub">職</span></h2>
+            <span class="chip-line" id="career-score">-</span>
+          </header>
+          <div class="block">
+            <h3>합격 · 성과 운이 강한 달</h3>
+            <p class="para small" id="r-peak">-</p>
+          </div>
+          <div class="block">
+            <h3>잘 맞는 일하는 방식</h3>
+            <p class="para small" id="r-style">-</p>
+          </div>
+          <div class="block">
+            <h3>실전 조언</h3>
+            <p class="para small" id="r-advice">-</p>
+          </div>
+        </section>
+
+        <section class="card months-card">
+          <header class="card-head">
+            <h2 class="card-title">2027 월별 로드맵 <span class="sub">1~12월</span></h2>
+          </header>
+          <div class="months" id="months"></div>
+        </section>
 
         <section class="card share-card">
           <h2 class="card-title">결과 공유</h2>
